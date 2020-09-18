@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { globalStyles, Colors } from '../../styles/globals';
 import Search from '../../components/Search';
 import youtubeApi from '../../services/youtube';
@@ -15,27 +16,7 @@ import {
   HaveChannelsText,
   NoChannelsText,
 } from './styles';
-
-interface ChannelThumbnailUrl {
-  url: string;
-}
-
-interface ChannelThumbnails {
-  default: ChannelThumbnailUrl;
-  high: ChannelThumbnailUrl;
-  medium: ChannelThumbnailUrl;
-}
-
-interface ChannelSnippet {
-  channelId: string;
-  channelTitle: string;
-  thumbnails: ChannelThumbnails;
-  description?: string;
-}
-
-export interface Channel {
-  snippet: ChannelSnippet;
-}
+import { Channel } from '../../models/Channel';
 
 interface SearchMetadata {
   search: string;
@@ -43,6 +24,7 @@ interface SearchMetadata {
 }
 
 const Home: React.FC = () => {
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -115,6 +97,13 @@ const Home: React.FC = () => {
     [searchChannels],
   );
 
+  const handlePressOnChannel = useCallback(
+    (channel: Channel) => {
+      navigation.navigate('Watch', { channel });
+    },
+    [navigation],
+  );
+
   return (
     <>
       <StatusBar
@@ -158,7 +147,11 @@ const Home: React.FC = () => {
                     </>
                   )}
                   renderItem={({ item }) => (
-                    <ChannelItem>
+                    <ChannelItem
+                      onPress={() => {
+                        handlePressOnChannel(item);
+                      }}
+                    >
                       <ChannelThumbnail
                         source={{ uri: item.snippet.thumbnails.high.url }}
                       />

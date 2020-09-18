@@ -2,15 +2,29 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Home from '../pages/Home';
+import Watch from '../pages/Watch';
+import { Channel } from '../models/Channel';
 
-const { Navigator, Screen } = createStackNavigator();
+interface WatchScreenProps {
+  channel: Channel;
+}
 
-export default function AppStack() {
+export type AppStackParamList = {
+  Home: undefined;
+  Watch: WatchScreenProps;
+};
+
+const { Navigator, Screen } = createStackNavigator<AppStackParamList>();
+
+const AppStack: React.FC = () => {
   return (
     <NavigationContainer>
       <Navigator screenOptions={{ headerShown: false }}>
-        <Screen name="Home" component={Home}/>
+        <Screen name="Home" component={Home} />
+        <Screen name="Watch" component={Watch} />
       </Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default AppStack;

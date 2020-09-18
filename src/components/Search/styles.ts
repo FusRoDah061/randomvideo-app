@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native";
-import { Colors } from "../../styles/globals";
+import { StyleSheet } from 'react-native';
+import { Colors } from '../../styles/globals';
 
 const styles = StyleSheet.create({
   searchContainer: {
@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     borderRadius: 10,
-    paddingLeft: 16
+    paddingLeft: 16,
   },
 
   searchButton: {
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
 });
 
 export default styles;

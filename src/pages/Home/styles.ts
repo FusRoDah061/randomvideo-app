@@ -1,6 +1,6 @@
 import { FlatList, RectButton } from 'react-native-gesture-handler';
 import styled from 'styled-components/native';
-import { Channel } from '.';
+import { Channel } from '../../models/Channel';
 import { Colors } from '../../styles/globals';
 
 export const Container = styled.View`
@@ -13,6 +13,7 @@ export const NoChannelsText = styled.Text`
   max-width: 220px;
   color: ${Colors.text.faintOnRed};
   margin-top: 25px;
+  margin-bottom: 25px;
   align-self: center;
 `;
 

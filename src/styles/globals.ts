@@ -1,6 +1,6 @@
 import { StyleSheet, Platform, StatusBar } from 'react-native';
 
-export function safeTopPadding(padding: number) {
+export function safeTopPadding(padding: number): number {
   const statusBarHeight = StatusBar.currentHeight || 0;
   return Platform.OS === 'android' ? statusBarHeight + padding : padding;
 }
@@ -16,18 +16,19 @@ export const Colors = {
     onRed: '#FFFFFF',
     title: '#262020',
     redOnLightRed: '#940000',
-  }
-}
+  },
+};
 
 export const globalStyles = StyleSheet.create({
   redContainer: {
     flex: 1,
     backgroundColor: Colors.red,
-    paddingTop: safeTopPadding(0)
+    paddingTop: safeTopPadding(0),
   },
 
   whiteContainer: {
     flex: 1,
     backgroundColor: Colors.white,
+    paddingTop: safeTopPadding(0),
   },
 });
