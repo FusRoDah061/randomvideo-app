@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles, Colors } from '../../styles/globals';
-import Search from '../../components/Search';
 import youtubeApi from '../../services/youtube';
 import {
   ChannelDescription,
@@ -15,8 +14,14 @@ import {
   Container,
   HaveChannelsText,
   NoChannelsText,
+  SearchButton,
+  SearchContainer,
+  SearchIcon,
+  SearchInput,
 } from './styles';
 import { Channel } from '../../models/Channel';
+
+import searchIcon from '../../assets/icons/search.png';
 
 interface SearchMetadata {
   search: string;
@@ -27,6 +32,7 @@ const Home: React.FC = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [search, setSearch] = useState('');
   const [channels, setChannels] = useState<Channel[]>([]);
   const [searchMetadata, setSearchMetadata] = useState<SearchMetadata | null>(
     null,
@@ -82,20 +88,17 @@ const Home: React.FC = () => {
     setIsLoadingPage(false);
   }, [searchMetadata, searchChannels]);
 
-  const handleSearchChannel = useCallback(
-    async (term: string) => {
-      setIsLoading(true);
+  const handleSearchChannel = useCallback(async () => {
+    setIsLoading(true);
 
-      try {
-        await searchChannels(term, false);
-      } catch (err) {
-        console.log(err);
-      }
+    try {
+      await searchChannels(search, false);
+    } catch (err) {
+      console.log(err);
+    }
 
-      setIsLoading(false);
-    },
-    [searchChannels],
-  );
+    setIsLoading(false);
+  }, [search, searchChannels]);
 
   const handlePressOnChannel = useCallback(
     (channel: Channel) => {
@@ -114,7 +117,20 @@ const Home: React.FC = () => {
 
       <SafeAreaView style={globalStyles.redContainer}>
         <Container>
-          <Search onSearch={handleSearchChannel} />
+          <SearchContainer>
+            <SearchInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search channel"
+              placeholderTextColor={Colors.text.placeholder}
+              returnKeyType="search"
+              onSubmitEditing={handleSearchChannel}
+            />
+
+            <SearchButton onPress={handleSearchChannel}>
+              <SearchIcon source={searchIcon} />
+            </SearchButton>
+          </SearchContainer>
 
           {channels.length === 0 && (
             <NoChannelsText>Search for a channel to begin</NoChannelsText>

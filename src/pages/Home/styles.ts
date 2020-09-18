@@ -7,6 +7,32 @@ export const Container = styled.View`
   flex: 1;
 `;
 
+export const SearchContainer = styled.View`
+  height: 52px;
+  background-color: ${Colors.white};
+  flex-direction: row;
+  margin: 20px;
+  border-radius: 10px;
+`;
+
+export const SearchInput = styled.TextInput`
+  flex: 1;
+  border-radius: 10px;
+  padding-left: 16px;
+`;
+
+export const SearchButton = styled(RectButton)`
+  height: 52px;
+  width: 52px;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const SearchIcon = styled.Image`
+  transform: scale(0.8);
+`;
+
 export const NoChannelsText = styled.Text`
   font-size: 24px;
   text-align: center;
