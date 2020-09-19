@@ -3,14 +3,16 @@ import styled from 'styled-components/native';
 import YouTube from 'react-native-youtube';
 import { Colors } from '../../styles/globals';
 
-export const Container = styled.View`
-  flex: 1;
-  padding: 10px 16px;
-`;
-
 export const Header = styled.View`
   flex-direction: row;
   align-items: center;
+  padding: 10px 16px;
+`;
+
+export const Container = styled.View`
+  flex: 1;
+  padding: 10px 16px;
+  padding-top: 0;
 `;
 
 export const BackButton = styled(RectButton)`

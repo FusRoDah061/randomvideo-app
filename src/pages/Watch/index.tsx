@@ -46,9 +46,7 @@ interface WatchProps {
 }
 
 interface Video {
-  id: {
-    videoId: string;
-  };
+  id: string;
   snippet: {
     publishedAt: string;
     title: string;
@@ -85,7 +83,6 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
       const response = await youtubeApi.get('search', {
         params: {
           type: 'video',
-          part: 'snippet',
           maxResults: 50,
           channelId: channel.snippet.channelId,
           videoEmbeddable: true,
@@ -110,13 +107,32 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
     return [];
   }, [channel, navigation]);
 
+  const loadVideo = useCallback(
+    async (id: string) => {
+      const response = await youtubeApi.get('videos', {
+        params: {
+          id,
+          type: 'video',
+          maxResults: 1,
+          part: 'snippet',
+        },
+      });
+
+      if (response) {
+        const { data } = response;
+        setVideo(data.items[0]);
+      }
+    },
+    [setVideo],
+  );
+
   const pickVideo = useCallback(async () => {
     const videos = await getVideos();
 
     if (videos.length > 0) {
       const index = Math.round(Math.random() * (videos.length - 0) + 0);
       const pickedVideo = videos[index];
-      setVideo(pickedVideo);
+      loadVideo(pickedVideo.id.videoId);
     } else {
       ToastAndroid.show(
         'There are no videos to choose from on this channel.',
@@ -126,7 +142,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
       navigation.goBack();
       setVideoIsReady(true);
     }
-  }, [getVideos]);
+  }, [getVideos, loadVideo, navigation]);
 
   const handleRollAgain = useCallback(async () => {
     setVideoIsReady(false);
@@ -154,16 +170,16 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
       />
 
       <SafeAreaView style={globalStyles.whiteContainer}>
+        <Header>
+          <BackButton onPress={() => navigation.goBack()}>
+            <BackIcon source={backIcon} />
+          </BackButton>
+
+          <Title>{channel?.snippet.channelTitle}</Title>
+        </Header>
+
         <ScrollView style={{ flex: 1 }}>
           <Container>
-            <Header>
-              <BackButton onPress={() => navigation.goBack()}>
-                <BackIcon source={backIcon} />
-              </BackButton>
-
-              <Title>{channel?.snippet.channelTitle}</Title>
-            </Header>
-
             <ChannelDetailsContainer>
               <ChannelLogo
                 source={{
@@ -198,7 +214,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
               <VideoContainer>
                 <EmbeddedVideo
                   apiKey="AIzaSyAWTKXcuAt4E3yiYpQvxKoi15z7mCGVnIw"
-                  videoId={video?.id.videoId}
+                  videoId={video?.id}
                   play
                   onReady={() => setVideoIsReady(true)}
                   onError={e => handleVideoError(e.error)}

@@ -37,6 +37,7 @@ const Home: React.FC = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [scrolledOnce, setScrolledOnce] = useState(false);
   const [search, setSearch] = useState('');
   const [channels, setChannels] = useState<Channel[]>([]);
   const [searchMetadata, setSearchMetadata] = useState<SearchMetadata | null>(
@@ -50,8 +51,8 @@ const Home: React.FC = () => {
           q: term,
           type: 'channel',
           part: 'snippet',
-          maxResults: 50,
           pageToken,
+          maxResults: 6,
         },
       });
 
@@ -76,6 +77,8 @@ const Home: React.FC = () => {
   );
 
   const handleNewPage = useCallback(async () => {
+    if (!scrolledOnce) return;
+
     setIsLoadingPage(true);
 
     try {
@@ -168,6 +171,8 @@ const Home: React.FC = () => {
                   }}
                   onEndReachedThreshold={0.5}
                   onEndReached={handleNewPage}
+                  onScrollEndDrag={() => setScrolledOnce(true)}
+                  onTouchMove={() => setScrolledOnce(true)}
                   ListFooterComponent={() => (
                     <>
                       {isLoadingPage && channels.length > 0 && (
