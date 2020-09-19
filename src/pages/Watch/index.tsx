@@ -118,6 +118,12 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
       const pickedVideo = videos[index];
       setVideo(pickedVideo);
     } else {
+      ToastAndroid.show(
+        'There are no videos to choose from on this channel.',
+        ToastAndroid.SHORT,
+      );
+
+      navigation.goBack();
       setVideoIsReady(true);
     }
   }, [getVideos]);
