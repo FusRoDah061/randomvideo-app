@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, StatusBar, Linking } from 'react-native';
+import {
+  SafeAreaView,
+  StatusBar,
+  Linking,
+  ToastAndroid,
+  ActivityIndicator,
+} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Link, RouteProp, useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { Colors, globalStyles } from '../../styles/globals';
 
 import {
@@ -28,7 +34,6 @@ import {
 
 import backIcon from '../../assets/icons/back.png';
 import { Channel } from '../../models/Channel';
-import ContentPlaceholder from '../../components/VideoContentPlaceholder';
 import { AppStackParamList } from '../../routes/AppStack';
 import youtubeApi from '../../services/youtube';
 import formatDate from '../../utils/formatDate';
@@ -59,11 +64,16 @@ interface Video {
 const Watch: React.FC<WatchProps> = ({ route }) => {
   const navigation = useNavigation();
   const [videoIsReady, setVideoIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [video, setVideo] = useState<Video | undefined>();
   const [channel] = useState<Channel>(route.params.channel);
 
   const handleVideoError = useCallback(error => {
     console.log(error);
+    ToastAndroid.show(
+      'An error ocurred while loading the video. Try again.',
+      ToastAndroid.LONG,
+    );
   }, []);
 
   const handleWatchYoutube = useCallback(() => {
@@ -89,36 +99,44 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
       }
     } catch (err) {
       console.log(err);
+      ToastAndroid.show(
+        'Could not fetch videos to choose from.',
+        ToastAndroid.SHORT,
+      );
+
+      navigation.goBack();
     }
 
     return [];
-  }, [channel]);
+  }, [channel, navigation]);
 
   const pickVideo = useCallback(async () => {
-    console.log('Picking video');
     const videos = await getVideos();
 
     if (videos.length > 0) {
       const index = Math.round(Math.random() * (videos.length - 0) + 0);
       const pickedVideo = videos[index];
-
-      console.log(pickedVideo.id.videoId);
-
       setVideo(pickedVideo);
     } else {
-      console.log('No videos');
       setVideoIsReady(true);
     }
   }, [getVideos]);
 
   const handleRollAgain = useCallback(async () => {
     setVideoIsReady(false);
+    setIsLoading(true);
     await pickVideo();
+    setIsLoading(false);
     setVideoIsReady(true);
   }, [pickVideo]);
 
   useEffect(() => {
-    pickVideo();
+    async function loadInitialVideo() {
+      await pickVideo();
+      setIsLoading(false);
+    }
+
+    loadInitialVideo();
   }, [pickVideo]);
 
   return (
@@ -154,6 +172,12 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
             <ButtonsContainer>
               <RollAgainButton enabled={videoIsReady} onPress={handleRollAgain}>
+                {isLoading && (
+                  <ActivityIndicator
+                    color={Colors.white}
+                    style={{ marginRight: 6 }}
+                  />
+                )}
                 <RollAgainButtonText>Roll again</RollAgainButtonText>
               </RollAgainButton>
 
@@ -170,7 +194,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
                   apiKey="AIzaSyAWTKXcuAt4E3yiYpQvxKoi15z7mCGVnIw"
                   videoId={video?.id.videoId}
                   play
-                  onReady={e => setVideoIsReady(true)}
+                  onReady={() => setVideoIsReady(true)}
                   onError={e => handleVideoError(e.error)}
                 />
 

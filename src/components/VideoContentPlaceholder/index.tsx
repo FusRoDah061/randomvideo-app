@@ -4,7 +4,7 @@ import ContentLoader, {
   IContentLoaderProps,
 } from 'react-content-loader/native';
 import { darken } from 'polished';
-import { Dimensions, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { Colors } from '../../styles/globals';
 
 type VideoContentPlaceholder = IContentLoaderProps;

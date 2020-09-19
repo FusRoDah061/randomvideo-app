@@ -61,6 +61,7 @@ export const ButtonsContainer = styled.View`
 `;
 
 export const RollAgainButton = styled(RectButton)`
+  flex-direction: row;
   width: 48%;
   height: 48px;
   align-items: center;

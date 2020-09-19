@@ -1,5 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { SafeAreaView, ActivityIndicator, StatusBar } from 'react-native';
+import {
+  SafeAreaView,
+  ActivityIndicator,
+  StatusBar,
+  ToastAndroid,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { globalStyles, Colors } from '../../styles/globals';
 import youtubeApi from '../../services/youtube';
@@ -75,14 +80,20 @@ const Home: React.FC = () => {
 
     try {
       if (searchMetadata) {
-        await searchChannels(
-          searchMetadata.search,
-          true,
-          searchMetadata.nextPageToken,
-        );
+        if (searchMetadata.nextPageToken) {
+          await searchChannels(
+            searchMetadata.search,
+            true,
+            searchMetadata.nextPageToken,
+          );
+        }
       }
     } catch (err) {
       console.log(err);
+      ToastAndroid.show(
+        'Could not fetch more results. Check internet connection and try again.',
+        ToastAndroid.LONG,
+      );
     }
 
     setIsLoadingPage(false);
@@ -95,6 +106,10 @@ const Home: React.FC = () => {
       await searchChannels(search, false);
     } catch (err) {
       console.log(err);
+      ToastAndroid.show(
+        'Could not search channel. Check internet connection and try again.',
+        ToastAndroid.LONG,
+      );
     }
 
     setIsLoading(false);
@@ -133,7 +148,9 @@ const Home: React.FC = () => {
           </SearchContainer>
 
           {channels.length === 0 && (
-            <NoChannelsText>Search for a channel to begin</NoChannelsText>
+            <NoChannelsText>
+              Search for any YouTube channel to begin
+            </NoChannelsText>
           )}
 
           {isLoading && (
