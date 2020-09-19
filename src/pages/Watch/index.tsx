@@ -28,9 +28,11 @@ import {
 
 import backIcon from '../../assets/icons/back.png';
 import { Channel } from '../../models/Channel';
+import ContentPlaceholder from '../../components/VideoContentPlaceholder';
 import { AppStackParamList } from '../../routes/AppStack';
 import youtubeApi from '../../services/youtube';
 import formatDate from '../../utils/formatDate';
+import VideoContentPlaceholder from '../../components/VideoContentPlaceholder';
 
 type WatchScreenRouteProp = RouteProp<AppStackParamList, 'Watch'>;
 
@@ -69,20 +71,24 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
   }, [video]);
 
   const getVideos = useCallback(async () => {
-    const response = await youtubeApi.get('search', {
-      params: {
-        type: 'video',
-        part: 'snippet',
-        maxResults: 50,
-        channelId: channel.snippet.channelId,
-        videoEmbeddable: true,
-        order: 'date',
-      },
-    });
+    try {
+      const response = await youtubeApi.get('search', {
+        params: {
+          type: 'video',
+          part: 'snippet',
+          maxResults: 50,
+          channelId: channel.snippet.channelId,
+          videoEmbeddable: true,
+          order: 'date',
+        },
+      });
 
-    if (response) {
-      const { data } = response;
-      return data.items;
+      if (response) {
+        const { data } = response;
+        return data.items;
+      }
+    } catch (err) {
+      console.log(err);
     }
 
     return [];
@@ -92,12 +98,17 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
     console.log('Picking video');
     const videos = await getVideos();
 
-    const index = Math.round(Math.random() * (videos.length - 0) + 0);
-    const pickedVideo = videos[index];
+    if (videos.length > 0) {
+      const index = Math.round(Math.random() * (videos.length - 0) + 0);
+      const pickedVideo = videos[index];
 
-    console.log(pickedVideo.id.videoId);
+      console.log(pickedVideo.id.videoId);
 
-    setVideo(pickedVideo);
+      setVideo(pickedVideo);
+    } else {
+      console.log('No videos');
+      setVideoIsReady(true);
+    }
   }, [getVideos]);
 
   const handleRollAgain = useCallback(async () => {
@@ -153,8 +164,8 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
               </WatchYoutubeButton>
             </ButtonsContainer>
 
-            <VideoContainer>
-              {video && (
+            {video ? (
+              <VideoContainer>
                 <EmbeddedVideo
                   apiKey="AIzaSyAWTKXcuAt4E3yiYpQvxKoi15z7mCGVnIw"
                   videoId={video?.id.videoId}
@@ -162,16 +173,20 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
                   onReady={e => setVideoIsReady(true)}
                   onError={e => handleVideoError(e.error)}
                 />
-              )}
 
-              <VideoTitle>{video?.snippet.title}</VideoTitle>
-              <VideoDate>
-                {video && formatDate(new Date(video.snippet.publishedAt))}
-              </VideoDate>
+                <VideoTitle>{video?.snippet.title}</VideoTitle>
+                <VideoDate>
+                  {video && formatDate(new Date(video.snippet.publishedAt))}
+                </VideoDate>
 
-              <VideDescriptionLabel>Description</VideDescriptionLabel>
-              <VideoDescription>{video?.snippet.description}</VideoDescription>
-            </VideoContainer>
+                <VideDescriptionLabel>Description</VideDescriptionLabel>
+                <VideoDescription>
+                  {video?.snippet.description}
+                </VideoDescription>
+              </VideoContainer>
+            ) : (
+              <VideoContentPlaceholder style={{ marginTop: 16 }} />
+            )}
           </Container>
         </ScrollView>
       </SafeAreaView>

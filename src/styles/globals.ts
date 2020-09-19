@@ -9,6 +9,7 @@ export const Colors = {
   red: '#D10000',
   white: '#FFFFFF',
   lightRedOnWhite: '#EFDEDE',
+  placeholderContent: '#F1F1F1',
   text: {
     placeholder: '#CCBCBC',
     faintOnRed: '#FFC2C2',
