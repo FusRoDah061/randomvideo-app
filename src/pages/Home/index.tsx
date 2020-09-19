@@ -27,6 +27,10 @@ import {
 import { Channel } from '../../models/Channel';
 
 import searchIcon from '../../assets/icons/search.png';
+import {
+  addSearchResultToCache,
+  getCachedSearchResult,
+} from '../../services/cache';
 
 interface SearchMetadata {
   search: string;
@@ -37,7 +41,6 @@ const Home: React.FC = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [scrolledOnce, setScrolledOnce] = useState(false);
   const [search, setSearch] = useState('');
   const [channels, setChannels] = useState<Channel[]>([]);
   const [searchMetadata, setSearchMetadata] = useState<SearchMetadata | null>(
@@ -46,39 +49,76 @@ const Home: React.FC = () => {
 
   const searchChannels = useCallback(
     async (term: string, append = false, pageToken = '') => {
-      const response = await youtubeApi.get('search', {
-        params: {
-          q: term,
-          type: 'channel',
-          part: 'snippet',
-          pageToken,
-          maxResults: 6,
-        },
+      const cache = await getCachedSearchResult({
+        search: term,
+        pageToken,
       });
 
-      if (response) {
-        const { data } = response;
-        const metadata = data;
+      if (cache) {
+        console.log('Found in cache');
+        const cacheChannels = cache?.channels;
+
+        const cacheSearchMeta = {
+          search: term,
+          nextPageToken: cache?.nextPageToken,
+        };
 
         if (append) {
-          const newChannels = channels.concat(data.items);
+          const newChannels = channels.concat(cacheChannels);
 
           setChannels(newChannels);
         } else {
-          setChannels(data.items);
+          setChannels(cacheChannels);
         }
 
-        delete metadata.items;
+        setSearchMetadata(cacheSearchMeta);
+      } else {
+        console.log('Not found in cache');
+        const response = await youtubeApi.get('search', {
+          params: {
+            q: term,
+            type: 'channel',
+            part: 'snippet',
+            pageToken,
+            maxResults: 7,
+          },
+        });
 
-        setSearchMetadata({ ...metadata, search: term });
+        if (response) {
+          const { data } = response;
+          const metadata = data;
+          const apiChannels = data.items.slice() as Channel[];
+          delete metadata.items;
+          const apiSearchMeta = metadata as SearchMetadata;
+
+          console.log('Updating cache');
+          addSearchResultToCache(
+            {
+              search: term,
+              pageToken,
+            },
+            {
+              channels: apiChannels,
+              nextPageToken: apiSearchMeta.nextPageToken,
+            },
+          );
+
+          if (append) {
+            const newChannels = channels.concat(apiChannels);
+
+            setChannels(newChannels);
+          } else {
+            setChannels(apiChannels);
+          }
+
+          setSearchMetadata({ ...apiSearchMeta, search: term });
+        }
       }
     },
     [channels],
   );
 
   const handleNewPage = useCallback(async () => {
-    if (!scrolledOnce) return;
-
     setIsLoadingPage(true);
 
     try {
@@ -169,10 +209,8 @@ const Home: React.FC = () => {
                   keyExtractor={(channel: Channel, index: number) => {
                     return `${channel.snippet.channelId}@${index}`;
                   }}
-                  onEndReachedThreshold={0.5}
+                  onEndReachedThreshold={0.01}
                   onEndReached={handleNewPage}
-                  onScrollEndDrag={() => setScrolledOnce(true)}
-                  onTouchMove={() => setScrolledOnce(true)}
                   ListFooterComponent={() => (
                     <>
                       {isLoadingPage && channels.length > 0 && (
