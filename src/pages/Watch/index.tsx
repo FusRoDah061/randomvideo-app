@@ -38,25 +38,13 @@ import { AppStackParamList } from '../../routes/AppStack';
 import youtubeApi from '../../services/youtube';
 import formatDate from '../../utils/formatDate';
 import VideoContentPlaceholder from '../../components/VideoContentPlaceholder';
+import { Video } from '../../models/Video';
+import { addVideosToCache, getCachedVideos } from '../../services/cache';
 
 type WatchScreenRouteProp = RouteProp<AppStackParamList, 'Watch'>;
 
 interface WatchProps {
   route: WatchScreenRouteProp;
-}
-
-interface Video {
-  id: string;
-  snippet: {
-    publishedAt: string;
-    title: string;
-    description?: string;
-    thumbnails: {
-      high: {
-        url: string;
-      };
-    };
-  };
 }
 
 const Watch: React.FC<WatchProps> = ({ route }) => {
@@ -79,6 +67,15 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
   }, [video]);
 
   const getVideos = useCallback(async () => {
+    const cachedVideos = await getCachedVideos(channel.snippet.channelId);
+
+    if (cachedVideos.length > 0) {
+      console.log('videos found in cache');
+      return cachedVideos;
+    }
+
+    console.log('Videos not found in cache');
+
     try {
       const response = await youtubeApi.get('search', {
         params: {
@@ -92,6 +89,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
       if (response) {
         const { data } = response;
+        addVideosToCache(channel.snippet.channelId, data.items);
         return data.items;
       }
     } catch (err) {
@@ -109,6 +107,17 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
   const loadVideo = useCallback(
     async (id: string) => {
+      const cachedVideos = await getCachedVideos(channel.snippet.channelId);
+
+      if (cachedVideos.length > 0) {
+        const videoById = cachedVideos.find(v => v.id === id);
+
+        if (videoById) {
+          setVideo(videoById);
+          return;
+        }
+      }
+
       const response = await youtubeApi.get('videos', {
         params: {
           id,
@@ -120,10 +129,14 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
       if (response) {
         const { data } = response;
+        addVideosToCache(channel.snippet.channelId, [
+          ...cachedVideos,
+          ...data.items,
+        ]);
         setVideo(data.items[0]);
       }
     },
-    [setVideo],
+    [setVideo, channel],
   );
 
   const pickVideo = useCallback(async () => {
