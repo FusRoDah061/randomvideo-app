@@ -1,5 +1,6 @@
 import { RectButton } from 'react-native-gesture-handler';
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
+import { darken } from 'polished';
 import YouTube from 'react-native-youtube';
 import { Colors } from '../../styles/globals';
 
@@ -70,6 +71,12 @@ export const RollAgainButton = styled(RectButton)`
   justify-content: center;
   border-radius: 10px;
   background: ${Colors.red};
+
+  ${props =>
+    !props.enabled &&
+    css`
+      background: ${darken(0.1, Colors.red)};
+    `}
 `;
 
 export const RollAgainButtonText = styled.Text`
