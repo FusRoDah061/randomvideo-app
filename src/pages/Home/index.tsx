@@ -91,8 +91,7 @@ const Home: React.FC = () => {
           delete metadata.items;
           const apiSearchMeta = metadata as SearchMetadata;
 
-          console.log('Updating cache');
-          addSearchResultToCache(
+          await addSearchResultToCache(
             {
               search: term,
               pageToken,

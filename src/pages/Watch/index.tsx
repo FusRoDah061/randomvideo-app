@@ -89,7 +89,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
       if (response) {
         const { data } = response;
-        addVideosToCache(channel.snippet.channelId, data.items);
+        await addVideosToCache(channel.snippet.channelId, data.items);
         return data.items;
       }
     } catch (err) {
@@ -107,17 +107,6 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
   const loadVideo = useCallback(
     async (id: string) => {
-      const cachedVideos = await getCachedVideos(channel.snippet.channelId);
-
-      if (cachedVideos.length > 0) {
-        const videoById = cachedVideos.find(v => v.id === id);
-
-        if (videoById) {
-          setVideo(videoById);
-          return;
-        }
-      }
-
       const response = await youtubeApi.get('videos', {
         params: {
           id,
@@ -129,23 +118,20 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
       if (response) {
         const { data } = response;
-        addVideosToCache(channel.snippet.channelId, [
-          ...cachedVideos,
-          ...data.items,
-        ]);
         setVideo(data.items[0]);
       }
     },
-    [setVideo, channel],
+    [setVideo],
   );
 
   const pickVideo = useCallback(async () => {
     const videos = await getVideos();
 
     if (videos.length > 0) {
-      const index = Math.round(Math.random() * (videos.length - 0) + 0);
+      const index = Math.round(Math.random() * (videos.length - 1) + 0);
+      console.log('index: ', index);
       const pickedVideo = videos[index];
-      loadVideo(pickedVideo.id.videoId);
+      await loadVideo(pickedVideo.id.videoId);
     } else {
       ToastAndroid.show(
         'There are no videos to choose from on this channel.',
