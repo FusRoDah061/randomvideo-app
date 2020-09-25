@@ -63,7 +63,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
   }, []);
 
   const handleWatchYoutube = useCallback(() => {
-    Linking.openURL(`vnd.youtube://${video?.id.videoId}`);
+    Linking.openURL(`vnd.youtube://${video?.id}`);
   }, [video]);
 
   const getVideos = useCallback(async () => {
