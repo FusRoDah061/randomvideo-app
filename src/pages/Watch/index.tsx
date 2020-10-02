@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import Config from 'react-native-config';
 import {
   SafeAreaView,
   StatusBar,
@@ -212,7 +213,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
             {video ? (
               <VideoContainer>
                 <EmbeddedVideo
-                  apiKey="AIzaSyAWTKXcuAt4E3yiYpQvxKoi15z7mCGVnIw"
+                  apiKey={Config.YOUTUBE_API_KEY}
                   videoId={video?.id}
                   play
                   onReady={() => setVideoIsReady(true)}
