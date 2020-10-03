@@ -27,10 +27,7 @@ import {
 import { Channel } from '../../models/Channel';
 
 import searchIcon from '../../assets/icons/search.png';
-import {
-  addSearchResultToCache,
-  getCachedSearchResult,
-} from '../../services/cache';
+import * as channelsCache from '../../services/channelsCache';
 
 interface SearchMetadata {
   search: string;
@@ -49,7 +46,7 @@ const Home: React.FC = () => {
 
   const searchChannels = useCallback(
     async (term: string, append = false, pageToken = '') => {
-      const cache = await getCachedSearchResult({
+      const cache = await channelsCache.getChannels({
         search: term,
         pageToken,
       });
@@ -91,7 +88,7 @@ const Home: React.FC = () => {
           delete metadata.items;
           const apiSearchMeta = metadata as SearchMetadata;
 
-          await addSearchResultToCache(
+          await channelsCache.setChannels(
             {
               search: term,
               pageToken,
@@ -145,7 +142,11 @@ const Home: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await searchChannels(search, false);
+      if (search) {
+        await searchChannels(search, false);
+      } else {
+        ToastAndroid.show('Search cannot be empty.', ToastAndroid.SHORT);
+      }
     } catch (err) {
       console.log(err);
       ToastAndroid.show(

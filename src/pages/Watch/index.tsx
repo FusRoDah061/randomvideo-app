@@ -40,7 +40,7 @@ import youtubeApi from '../../services/youtube';
 import formatDate from '../../utils/formatDate';
 import VideoContentPlaceholder from '../../components/VideoContentPlaceholder';
 import { Video } from '../../models/Video';
-import { addVideosToCache, getCachedVideos } from '../../services/cache';
+import * as videosCache from '../../services/videosCache';
 
 type WatchScreenRouteProp = RouteProp<AppStackParamList, 'Watch'>;
 
@@ -68,7 +68,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
   }, [video]);
 
   const getVideos = useCallback(async () => {
-    const cachedVideos = await getCachedVideos(channel.snippet.channelId);
+    const cachedVideos = await videosCache.getVideos(channel.snippet.channelId);
 
     if (cachedVideos.length > 0) {
       console.log('videos found in cache');
@@ -90,7 +90,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
       if (response) {
         const { data } = response;
-        await addVideosToCache(channel.snippet.channelId, data.items);
+        await videosCache.setVideos(channel.snippet.channelId, data.items);
         return data.items;
       }
     } catch (err) {
