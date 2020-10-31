@@ -86,7 +86,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
+    enableHermes: true,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -104,7 +104,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -159,11 +159,11 @@ android {
             keyPassword 'android'
         }
         release {
-            if (project.hasProperty('APP_UPLOAD_STORE_FILE')) {
-                storeFile file(APP_UPLOAD_STORE_FILE)
-                storePassword APP_UPLOAD_STORE_PASSWORD
-                keyAlias APP_UPLOAD_KEY_ALIAS
-                keyPassword APP_UPLOAD_KEY_PASSWORD
+            if (project.hasProperty('ANDROID_UPLOAD_STORE_FILE')) {
+                storeFile file(ANDROID_UPLOAD_STORE_FILE)
+                storePassword ANDROID_UPLOAD_STORE_PASSWORD
+                keyAlias ANDROID_UPLOAD_KEY_ALIAS
+                keyPassword ANDROID_UPLOAD_KEY_PASSWORD
             }
         }
     }
