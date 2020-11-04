@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { Platform } from 'react-native';
-import { getBundleId } from 'react-native-device-info';
 import Config from 'react-native-config';
 
 const androidHeaders = {
-  'X-Android-Package': getBundleId() || Config.APP_PACKAGE || '',
+  'X-Android-Package': Config.APP_PACKAGE || '',
   'X-Android-Cert': Config.APP_CERT_FINGERPRINT || '',
 };
 
