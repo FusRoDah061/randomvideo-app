@@ -1,13 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   SafeAreaView,
   ActivityIndicator,
   StatusBar,
   ToastAndroid,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Config from 'react-native-config';
 import { globalStyles, Colors } from '../../styles/globals';
 import youtubeApi from '../../services/youtube';
 import {
@@ -166,13 +164,6 @@ const Home: React.FC = () => {
     },
     [navigation],
   );
-
-  useEffect(() => {
-    Alert.alert(
-      'Env',
-      `YOUTUBE_API_KEY:${Config.YOUTUBE_API_KEY}\nAPP_PACKAGE:${Config.APP_PACKAGE}\nAPP_CERT_FINGERPRINT:${Config.APP_CERT_FINGERPRINT}`,
-    );
-  }, []);
 
   return (
     <>
