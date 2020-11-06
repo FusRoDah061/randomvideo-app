@@ -86,10 +86,11 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: true,  // clean and rebuild if changing
+    enableHermes: false,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -158,6 +159,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        relaseStaging {
+            if (project.hasProperty('ANDROID_UPLOAD_STORE_FILE')) {
+                storeFile file(ANDROID_UPLOAD_STORE_FILE)
+                storePassword ANDROID_UPLOAD_STORE_PASSWORD
+                keyAlias ANDROID_UPLOAD_KEY_ALIAS
+                keyPassword ANDROID_UPLOAD_KEY_PASSWORD
+            }
+        }
         release {
             if (project.hasProperty('ANDROID_UPLOAD_STORE_FILE')) {
                 storeFile file(ANDROID_UPLOAD_STORE_FILE)
@@ -170,10 +179,20 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            resValue "string", "CodePushDeploymentKey", '""'
+        }
+        releaseStaging {
+            // Caso precise gerar uma build local, descomente essa linha
+            signingConfig signingConfigs.release
+            resValue "string", "CodePushDeploymentKey", '"YVdEXPJ-BUMmbKOxZ4wifIiy_-aez7LB6QzDw"'
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            matchingFallbacks = ['release']
         }
         release {
             // Caso precise gerar uma build local, descomente essa linha
             // signingConfig signingConfigs.release
+            resValue "string", "CodePushDeploymentKey", '"cAKl50D7C5wgwpZh_jB6SFSM7BeKLJIo_lye2"'
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
