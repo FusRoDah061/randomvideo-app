@@ -192,7 +192,7 @@ const Home: React.FC = () => {
 
           {channels.length === 0 && (
             <NoChannelsText>
-              Search for any YouTube channel to begin
+              Search for any channel to begin
             </NoChannelsText>
           )}
 
