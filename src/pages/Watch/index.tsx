@@ -205,7 +205,7 @@ const Watch: React.FC<WatchProps> = ({ route }) => {
 
               <WatchYoutubeButton onPress={handleWatchYoutube}>
                 <WatchYoutubeButtonText>
-                  Watch on YouTube
+                  Watch from source
                 </WatchYoutubeButtonText>
               </WatchYoutubeButton>
             </ButtonsContainer>
