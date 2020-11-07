@@ -191,7 +191,7 @@ android {
         }
         release {
             // Caso precise gerar uma build local, descomente essa linha
-            signingConfig signingConfigs.release
+            // signingConfig signingConfigs.release
             resValue "string", "CodePushDeploymentKey", '"cAKl50D7C5wgwpZh_jB6SFSM7BeKLJIo_lye2"'
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
